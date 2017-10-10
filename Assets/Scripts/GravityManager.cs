@@ -148,7 +148,8 @@ public class GravityManager : MonoBehaviour
         ray_collide_left_d = Physics2D.Raycast(new Vector3(pos[0], pos[1] - (sprite_height / 2) + 0.05f, pos[2]), Vector3.left);
         ray_collide_right_u = Physics2D.Raycast(new Vector3(pos[0], pos[1] + (sprite_height / 2) - 0.05f, pos[2]), Vector3.right);
         ray_collide_right_d = Physics2D.Raycast(new Vector3(pos[0], pos[1] - (sprite_height / 2) + 0.05f, pos[2]), Vector3.right);
-
+        Debug.Log(jump_on);
+        Debug.Log(number_jump);
         if (!jump_on)
         {
             if ((ray_collide_down_l.collider != null && Mathf.Abs(ray_collide_down_l.point.y - transform.position.y) >= (sprite_height / 2) + collisionMaxDistanceDetection)
@@ -159,6 +160,7 @@ public class GravityManager : MonoBehaviour
                     if (transform.position.y - sprite_height / 2 - gravity < ray_collide_down_l.point.y)
                     {
                         this.transform.Translate(new Vector3(0, -(transform.position.y - ray_collide_down_l.point.y - sprite_height / 2), 0));
+                        number_jump = 0f;
                     }
                     else
                     {
@@ -170,6 +172,7 @@ public class GravityManager : MonoBehaviour
                     if (transform.position.y - sprite_height / 2 - gravity < ray_collide_down_r.point.y)
                     {
                         this.transform.Translate(new Vector3(0, -(transform.position.y - ray_collide_down_r.point.y - sprite_height / 2), 0));
+                        number_jump = 0f;
                     }
                     else
                     {
