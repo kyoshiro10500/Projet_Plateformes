@@ -209,6 +209,10 @@ public class GravityManager : MonoBehaviour {
                         }
                     }
                 }
+                else
+                {
+                    jump_on = false;
+                }
             }
             else
             {
