@@ -28,6 +28,7 @@ public class GravityManager : MonoBehaviour {
     private bool jump_on = false;
     private float jump_origin_y;
     private float jump_height_reached = 0;
+    private float number_jump = 0f;
 
     private RaycastHit2D ray_collide_down_l;
     private RaycastHit2D ray_collide_down_r;
@@ -50,11 +51,12 @@ public class GravityManager : MonoBehaviour {
 
     public void Set_Jump(bool toActivate)
     {
-        if(toActivate)
+        if(toActivate && number_jump < 2f)
         {
             jump_on = true;
             jump_origin_y = this.transform.position.y;
             jump_height_reached = 0;
+            number_jump++;
         }
         else
         {
@@ -172,6 +174,10 @@ public class GravityManager : MonoBehaviour {
                     }
                 }
             }
+            else
+            {
+                number_jump = 0f;
+            }
         }
         else
         {
@@ -185,7 +191,6 @@ public class GravityManager : MonoBehaviour {
                         if (transform.position.y + sprite_height / 2 + gravity > ray_collide_up_l.point.y)
                         {
                             this.transform.Translate(new Vector3(0, ray_collide_up_l.point.y - transform.position.y - sprite_height / 2, 0));
-                            jump_on = false;
                         }
                         else
                         {
@@ -197,7 +202,6 @@ public class GravityManager : MonoBehaviour {
                         if (transform.position.y + sprite_height / 2 + gravity > ray_collide_up_r.point.y)
                         {
                             this.transform.Translate(new Vector3(0, (ray_collide_up_r.point.y - transform.position.y - sprite_height / 2), 0));
-                            jump_on = false;
                         }
                         else
                         {
