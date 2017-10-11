@@ -91,12 +91,11 @@ public class GravityManager : MonoBehaviour
                 if (transform.position.x + sprite_width / 2 + horizontal_axis * Time.deltaTime * speed_to_use > ray_collide_right_d.point.x)
                 {
                     this.transform.Translate(new Vector3(ray_collide_right_d.point.x - sprite_height / 2 - transform.position.x, 0, 0));
-                    gravity_to_use = gravity_wall;
                 }
                 else
                 {
                     this.transform.Translate(new Vector3(Time.deltaTime * horizontal_axis * speed_to_use, 0, 0));
-                    gravity_to_use = gravity;
+                    
                 }
             }
             else
@@ -104,12 +103,10 @@ public class GravityManager : MonoBehaviour
                 if (transform.position.x + sprite_width / 2 + horizontal_axis * Time.deltaTime * speed_to_use > ray_collide_right_u.point.x)
                 {
                     this.transform.Translate(new Vector3(ray_collide_right_u.point.x - sprite_height / 2 - transform.position.x, 0, 0));
-                    gravity_to_use = gravity_wall;
                 }
                 else
                 {
                     this.transform.Translate(new Vector3(Time.deltaTime * horizontal_axis * speed_to_use, 0, 0));
-                    gravity_to_use = gravity;
                 }
             }
         }
@@ -122,12 +119,10 @@ public class GravityManager : MonoBehaviour
                 if (transform.position.x - sprite_width / 2 + horizontal_axis * Time.deltaTime* speed_to_use < ray_collide_left_d.point.x)
                 {
                     this.transform.Translate(new Vector3(ray_collide_left_d.point.x - transform.position.x + sprite_width / 2, 0, 0));
-                    gravity_to_use = gravity_wall;
                 }
                 else
                 {
                     this.transform.Translate(new Vector3(Time.deltaTime * horizontal_axis * speed_to_use, 0, 0));
-                    gravity_to_use = gravity;
                 }
             }
             else
@@ -135,12 +130,10 @@ public class GravityManager : MonoBehaviour
                 if (transform.position.x - sprite_width / 2 + horizontal_axis * Time.deltaTime* speed_to_use < ray_collide_left_u.point.x)
                 {
                     this.transform.Translate(new Vector3(ray_collide_left_u.point.x - transform.position.x + sprite_width / 2, 0, 0));
-                    gravity_to_use = gravity_wall;
                 }
                 else
                 {
                     this.transform.Translate(new Vector3(Time.deltaTime * horizontal_axis * speed_to_use, 0, 0));
-                    gravity_to_use = gravity;
                 }
             }
         }
@@ -264,6 +257,25 @@ public class GravityManager : MonoBehaviour
                         jump_height_reached += Time.deltaTime;
                     }
                 }
+            }
+        }
+
+        
+        if ((ray_collide_left_u.collider != null && Mathf.Abs(ray_collide_left_u.point.x - transform.position.x) <= (sprite_width / 2)+0.1f)
+                || (ray_collide_left_d.collider != null && Mathf.Abs(ray_collide_left_d.point.x - transform.position.x) <= (sprite_width / 2)+0.1f))
+        {
+            gravity_to_use = gravity_wall;
+        }
+        else
+        {
+            if ((ray_collide_right_u.collider != null && Mathf.Abs(ray_collide_right_u.point.x - transform.position.x) <= (sprite_width / 2)+0.1f)
+                || (ray_collide_right_d.collider != null && Mathf.Abs(ray_collide_right_d.point.x - transform.position.x) <= (sprite_width / 2)+0.1f))
+            {
+                gravity_to_use = gravity_wall;
+            }
+            else
+            {
+                gravity_to_use = gravity;
             }
         }
     }
