@@ -36,7 +36,7 @@ public class VerticalPlateforme : MonoBehaviour {
                 vitesse = -vitesse;
             }
 
-            this.transform.Translate(new Vector3(vitesse, 0, 0));
+            this.transform.Translate(new Vector3(Time.deltaTime * vitesse, 0, 0));
         }
         else
         {
@@ -45,7 +45,7 @@ public class VerticalPlateforme : MonoBehaviour {
                 vitesse = -vitesse;
             }
 
-            this.transform.Translate(new Vector3(0, vitesse, 0));
+            this.transform.Translate(new Vector3(0, Time.deltaTime * vitesse, 0));
         }
 	}
 }
