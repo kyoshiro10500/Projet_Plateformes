@@ -12,7 +12,7 @@ public class InputManager : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
         float horizontal_axis = 0f;
-        horizontal_axis = Input.GetAxis("Horizontal");
+        horizontal_axis = Input.GetAxisRaw("Horizontal");
         if(horizontal_axis != 0)
         {
             this.GetComponent<GravityManager>().Horizontal_Move(horizontal_axis);

@@ -10,7 +10,7 @@ public class GravityManager : MonoBehaviour
     private float gravity;
 
     [SerializeField]
-    private float collisionMaxDistanceDetection;
+    private float gravity_wall;
 
     [Header("Player")]
     [SerializeField]
@@ -25,6 +25,7 @@ public class GravityManager : MonoBehaviour
     [SerializeField]
     private float time_stay_up;
 
+    private float gravity_to_use;
     private float speed_to_use;
     private bool jump_on = false;
     private float jump_origin_y;
@@ -49,6 +50,7 @@ public class GravityManager : MonoBehaviour
         sprite_width = this.GetComponent<Renderer>().bounds.size[0];
         sprite_height = this.GetComponent<Renderer>().bounds.size[1];
         speed_to_use = speed_horizontal;
+        gravity_to_use = gravity;
     }
 
     public void Set_Jump(bool toActivate)
@@ -81,56 +83,64 @@ public class GravityManager : MonoBehaviour
     public void Horizontal_Move(float horizontal_axis)
     {
 
-        if ((horizontal_axis > 0 && ray_collide_right_u.collider != null && Mathf.Abs(ray_collide_right_u.point.x - transform.position.x) >= (sprite_width / 2) + collisionMaxDistanceDetection)
-            && (horizontal_axis > 0 && ray_collide_right_d.collider != null && Mathf.Abs(ray_collide_right_d.point.x - transform.position.x) >= (sprite_width / 2) + collisionMaxDistanceDetection))
+        if ((horizontal_axis > 0 && ray_collide_right_u.collider != null && Mathf.Abs(ray_collide_right_u.point.x - transform.position.x) >= (sprite_width / 2))
+            && (horizontal_axis > 0 && ray_collide_right_d.collider != null && Mathf.Abs(ray_collide_right_d.point.x - transform.position.x) >= (sprite_width / 2)))
         {
             if (ray_collide_right_d.point.x <= ray_collide_right_u.point.x)
             {
-                if (transform.position.x + sprite_width / 2 + horizontal_axis * speed_to_use > ray_collide_right_d.point.x)
+                if (transform.position.x + sprite_width / 2 + horizontal_axis * Time.deltaTime * speed_to_use > ray_collide_right_d.point.x)
                 {
                     this.transform.Translate(new Vector3(ray_collide_right_d.point.x - sprite_height / 2 - transform.position.x, 0, 0));
+                    gravity_to_use = gravity_wall;
                 }
                 else
                 {
-                    this.transform.Translate(new Vector3(horizontal_axis * speed_to_use, 0, 0));
+                    this.transform.Translate(new Vector3(Time.deltaTime * horizontal_axis * speed_to_use, 0, 0));
+                    gravity_to_use = gravity;
                 }
             }
             else
             {
-                if (transform.position.x + sprite_width / 2 + horizontal_axis * speed_to_use > ray_collide_right_u.point.x)
+                if (transform.position.x + sprite_width / 2 + horizontal_axis * Time.deltaTime * speed_to_use > ray_collide_right_u.point.x)
                 {
                     this.transform.Translate(new Vector3(ray_collide_right_u.point.x - sprite_height / 2 - transform.position.x, 0, 0));
+                    gravity_to_use = gravity_wall;
                 }
                 else
                 {
-                    this.transform.Translate(new Vector3(horizontal_axis * speed_to_use, 0, 0));
+                    this.transform.Translate(new Vector3(Time.deltaTime * horizontal_axis * speed_to_use, 0, 0));
+                    gravity_to_use = gravity;
                 }
             }
         }
 
-        if ((horizontal_axis < 0 && ray_collide_left_u.collider != null && Mathf.Abs(ray_collide_left_u.point.x - transform.position.x) >= (sprite_width / 2) + collisionMaxDistanceDetection)
-            && (horizontal_axis < 0 && ray_collide_left_d.collider != null && Mathf.Abs(ray_collide_left_d.point.x - transform.position.x) >= (sprite_width / 2) + collisionMaxDistanceDetection))
+        if ((horizontal_axis < 0 && ray_collide_left_u.collider != null && Mathf.Abs(ray_collide_left_u.point.x - transform.position.x) >= (sprite_width / 2) )
+            && (horizontal_axis < 0 && ray_collide_left_d.collider != null && Mathf.Abs(ray_collide_left_d.point.x - transform.position.x) >= (sprite_width / 2)))
         {
             if (ray_collide_left_d.point.x >= ray_collide_left_u.point.x)
             {
-                if (transform.position.x - sprite_width / 2 + horizontal_axis * speed_to_use < ray_collide_left_d.point.x)
+                if (transform.position.x - sprite_width / 2 + horizontal_axis * Time.deltaTime* speed_to_use < ray_collide_left_d.point.x)
                 {
                     this.transform.Translate(new Vector3(ray_collide_left_d.point.x - transform.position.x + sprite_width / 2, 0, 0));
+                    gravity_to_use = gravity_wall;
                 }
                 else
                 {
-                    this.transform.Translate(new Vector3(horizontal_axis * speed_to_use, 0, 0));
+                    this.transform.Translate(new Vector3(Time.deltaTime * horizontal_axis * speed_to_use, 0, 0));
+                    gravity_to_use = gravity;
                 }
             }
             else
             {
-                if (transform.position.x - sprite_width / 2 + horizontal_axis * speed_to_use < ray_collide_left_u.point.x)
+                if (transform.position.x - sprite_width / 2 + horizontal_axis * Time.deltaTime* speed_to_use < ray_collide_left_u.point.x)
                 {
                     this.transform.Translate(new Vector3(ray_collide_left_u.point.x - transform.position.x + sprite_width / 2, 0, 0));
+                    gravity_to_use = gravity_wall;
                 }
                 else
                 {
-                    this.transform.Translate(new Vector3(horizontal_axis * speed_to_use, 0, 0));
+                    this.transform.Translate(new Vector3(Time.deltaTime * horizontal_axis * speed_to_use, 0, 0));
+                    gravity_to_use = gravity;
                 }
             }
         }
@@ -140,43 +150,58 @@ public class GravityManager : MonoBehaviour
     void Update()
     {
         Vector3 pos = this.transform.position;
-        ray_collide_up_l = Physics2D.Raycast(new Vector3(pos[0] - (sprite_width / 2) + 0.05f, pos[1], pos[2]), Vector3.up);
-        ray_collide_up_r = Physics2D.Raycast(new Vector3(pos[0] + (sprite_width / 2) - 0.05f, pos[1], pos[2]), Vector3.up);
-        ray_collide_down_l = Physics2D.Raycast(new Vector3(pos[0] - (sprite_width / 2) + 0.05f, pos[1], pos[2]), Vector3.down);
-        ray_collide_down_r = Physics2D.Raycast(new Vector3(pos[0] + (sprite_width / 2) - 0.05f, pos[1], pos[2]), Vector3.down);
-        ray_collide_left_u = Physics2D.Raycast(new Vector3(pos[0], pos[1] + (sprite_height / 2) - 0.05f, pos[2]), Vector3.left);
-        ray_collide_left_d = Physics2D.Raycast(new Vector3(pos[0], pos[1] - (sprite_height / 2) + 0.05f, pos[2]), Vector3.left);
-        ray_collide_right_u = Physics2D.Raycast(new Vector3(pos[0], pos[1] + (sprite_height / 2) - 0.05f, pos[2]), Vector3.right);
-        ray_collide_right_d = Physics2D.Raycast(new Vector3(pos[0], pos[1] - (sprite_height / 2) + 0.05f, pos[2]), Vector3.right);
-        Debug.Log(jump_on);
-        Debug.Log(number_jump);
+
+        ray_collide_up_l = Physics2D.Raycast(new Vector3(pos[0] - (sprite_width / 2) +0.0001f , pos[1], pos[2]), Vector3.up);
+        ray_collide_up_r = Physics2D.Raycast(new Vector3(pos[0] + (sprite_width / 2) -0.0001f , pos[1], pos[2]), Vector3.up);
+        ray_collide_down_l = Physics2D.Raycast(new Vector3(pos[0] - (sprite_width / 2) + 0.0001f , pos[1], pos[2]), Vector3.down);
+        ray_collide_down_r = Physics2D.Raycast(new Vector3(pos[0] + (sprite_width / 2) - 0.0001f , pos[1], pos[2]), Vector3.down);
+        ray_collide_left_u = Physics2D.Raycast(new Vector3(pos[0], pos[1] + (sprite_height / 2) - 0.001f , pos[2]), Vector3.left);
+        ray_collide_left_d = Physics2D.Raycast(new Vector3(pos[0], pos[1] - (sprite_height / 2) + 0.001f, pos[2]), Vector3.left);
+        ray_collide_right_u = Physics2D.Raycast(new Vector3(pos[0], pos[1] + (sprite_height / 2) - 0.001f, pos[2]), Vector3.right);
+        ray_collide_right_d = Physics2D.Raycast(new Vector3(pos[0], pos[1] - (sprite_height / 2) +0.001f , pos[2]), Vector3.right);
+        Debug.DrawRay(new Vector3(pos[0] - (sprite_width / 2), pos[1], pos[2]), Vector3.up);
+        Debug.DrawRay(new Vector3(pos[0] + (sprite_width / 2), pos[1], pos[2]), Vector3.up);
+        Debug.DrawRay(new Vector3(pos[0] - (sprite_width / 2), pos[1], pos[2]), Vector3.down);
+        Debug.DrawRay(new Vector3(pos[0] + (sprite_width / 2), pos[1], pos[2]), Vector3.down);
+        Debug.DrawRay(new Vector3(pos[0], pos[1] + (sprite_height / 2), pos[2]), Vector3.left);
+        Debug.DrawRay(new Vector3(pos[0], pos[1] - (sprite_height / 2), pos[2]), Vector3.left);
+        Debug.DrawRay(new Vector3(pos[0], pos[1] + (sprite_height / 2), pos[2]), Vector3.right);
+        Debug.DrawRay(new Vector3(pos[0], pos[1] - (sprite_height / 2), pos[2]), Vector3.right);
         if (!jump_on)
         {
-            if ((ray_collide_down_l.collider != null && Mathf.Abs(ray_collide_down_l.point.y - transform.position.y) >= (sprite_height / 2) + collisionMaxDistanceDetection)
-                && (ray_collide_down_r.collider != null && Mathf.Abs(ray_collide_down_r.point.y - transform.position.y) >= (sprite_height / 2) + collisionMaxDistanceDetection))
+            if ((ray_collide_down_l.collider != null && Mathf.Abs(ray_collide_down_l.point.y - transform.position.y) >= (sprite_height / 2))
+                && (ray_collide_down_r.collider != null && Mathf.Abs(ray_collide_down_r.point.y - transform.position.y) >= (sprite_height / 2)))
             {
                 if (ray_collide_down_l.point.y >= ray_collide_down_r.point.y)
                 {
-                    if (transform.position.y - sprite_height / 2 - gravity < ray_collide_down_l.point.y)
+                    if (transform.position.y - sprite_height / 2 - Time.deltaTime * gravity_to_use < ray_collide_down_l.point.y)
                     {
                         this.transform.Translate(new Vector3(0, -(transform.position.y - ray_collide_down_l.point.y - sprite_height / 2), 0));
                         number_jump = 0f;
                     }
                     else
                     {
-                        this.transform.Translate(new Vector3(0, -gravity, 0));
+                        this.transform.Translate(new Vector3(0, -Time.deltaTime * gravity_to_use, 0));
+                        if(number_jump != 1)
+                        {
+                            number_jump = 2;
+                        }
                     }
                 }
                 else
                 {
-                    if (transform.position.y - sprite_height / 2 - gravity < ray_collide_down_r.point.y)
+                    if (transform.position.y - sprite_height / 2 - Time.deltaTime * gravity_to_use < ray_collide_down_r.point.y)
                     {
-                        this.transform.Translate(new Vector3(0, -(transform.position.y - ray_collide_down_r.point.y - sprite_height / 2), 0));
+                        this.transform.Translate(new Vector3(0,-(transform.position.y - ray_collide_down_r.point.y - sprite_height / 2), 0));
                         number_jump = 0f;
                     }
                     else
                     {
-                        this.transform.Translate(new Vector3(0, -gravity, 0));
+                        this.transform.Translate(new Vector3(0, -Time.deltaTime * gravity_to_use, 0));
+                        if (number_jump != 1)
+                        {
+                            number_jump = 2;
+                        }
                     }
                 }
             }
@@ -189,29 +214,31 @@ public class GravityManager : MonoBehaviour
         {
             if (this.transform.position.y < jump_origin_y + jump_height)
             {
-                if ((ray_collide_up_l.collider != null && Mathf.Abs(ray_collide_up_l.point.y - transform.position.y) >= (sprite_height / 2) + collisionMaxDistanceDetection)
-                && (ray_collide_up_r.collider != null && Mathf.Abs(ray_collide_up_r.point.y - transform.position.y) >= (sprite_height / 2) + collisionMaxDistanceDetection))
+                if ((ray_collide_up_l.collider != null && Mathf.Abs(ray_collide_up_l.point.y - transform.position.y) >= (sprite_height / 2))
+                && (ray_collide_up_r.collider != null && Mathf.Abs(ray_collide_up_r.point.y - transform.position.y) >= (sprite_height / 2)))
                 {
                     if (ray_collide_up_l.point.y <= ray_collide_up_r.point.y)
                     {
-                        if (transform.position.y + sprite_height / 2 + gravity > ray_collide_up_l.point.y)
+                        if (transform.position.y + sprite_height / 2 + Time.deltaTime * gravity > ray_collide_up_l.point.y)
                         {
                             this.transform.Translate(new Vector3(0, ray_collide_up_l.point.y - transform.position.y - sprite_height / 2, 0));
+                            jump_on = false;
                         }
                         else
                         {
-                            this.transform.Translate(new Vector3(0, gravity, 0));
+                            this.transform.Translate(new Vector3(0, Time.deltaTime * gravity, 0));
                         }
                     }
                     else
                     {
-                        if (transform.position.y + sprite_height / 2 + gravity > ray_collide_up_r.point.y)
+                        if (transform.position.y + sprite_height / 2 + Time.deltaTime * gravity > ray_collide_up_r.point.y)
                         {
-                            this.transform.Translate(new Vector3(0, (ray_collide_up_r.point.y - transform.position.y - sprite_height / 2), 0));
+                            this.transform.Translate(new Vector3(0, ray_collide_up_r.point.y - transform.position.y - sprite_height / 2, 0));
+                            jump_on = false;
                         }
                         else
                         {
-                            this.transform.Translate(new Vector3(0, gravity, 0));
+                            this.transform.Translate(new Vector3(0, Time.deltaTime * gravity, 0));
                         }
                     }
                 }
@@ -240,4 +267,5 @@ public class GravityManager : MonoBehaviour
             }
         }
     }
+
 }
