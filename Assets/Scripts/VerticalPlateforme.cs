@@ -10,6 +10,25 @@ public class VerticalPlateforme : MonoBehaviour {
     [SerializeField]
     private float vitesse;
 
+    private float vitesse_horizontale = 0;
+    public float Vitesse_horizontale
+    {
+        get
+        {
+            return vitesse_horizontale;
+        }
+       
+    }
+
+    private float vitesse_verticale = 0;
+    public float Vitesse_verticale
+    {
+        get
+        {
+            return vitesse_verticale;
+        }
+    }
+
     [SerializeField]
     private bool is_horizontal;
 
@@ -19,10 +38,12 @@ public class VerticalPlateforme : MonoBehaviour {
         if(is_horizontal)
         {
             min_hauteur = this.transform.position.x - 0.01f;
+            vitesse_horizontale = vitesse;
         }
         else
         {
             min_hauteur = this.transform.position.y - 0.01f;
+            vitesse_verticale = vitesse;
         }
         
 	}
@@ -34,6 +55,7 @@ public class VerticalPlateforme : MonoBehaviour {
             if (this.transform.position.x <= min_hauteur || this.transform.position.x >= min_hauteur + max_amplitude)
             {
                 vitesse = -vitesse;
+                vitesse_horizontale = vitesse;
             }
 
             this.transform.Translate(new Vector3(Time.deltaTime * vitesse, 0, 0));
@@ -43,6 +65,7 @@ public class VerticalPlateforme : MonoBehaviour {
             if (this.transform.position.y <= min_hauteur || this.transform.position.y >= min_hauteur + max_amplitude)
             {
                 vitesse = -vitesse;
+                vitesse_verticale = vitesse;
             }
 
             this.transform.Translate(new Vector3(0, Time.deltaTime * vitesse, 0));
