@@ -215,7 +215,7 @@ public class GravityManager : MonoBehaviour
     void Update()
     {
         calculateRay();
-        if (!jump_on && !toStayUp )
+        if (!jump_on && !toStayUp)
         {
             if(verif_collision(ray_collide_down_l, (sprite_height / 2),false) && verif_collision(ray_collide_down_r, (sprite_height / 2), false))
             {
@@ -281,35 +281,56 @@ public class GravityManager : MonoBehaviour
                 {
                     if (ray_collide_up_l.point.y <= ray_collide_up_r.point.y)
                     {
-                        if (transform.position.y + sprite_height / 2 + Time.deltaTime * gravity > ray_collide_up_l.point.y)
-                        {
-                            this.transform.Translate(new Vector3(0, ray_collide_up_l.point.y - transform.position.y - sprite_height / 2, 0));
-                            jump_on = false;
-                            toStayUp = true;
-                        }
-                        else
-                        {
-                            this.transform.Translate(new Vector3(0, Time.deltaTime * gravity, 0));
-                        }
+                            if (transform.position.y + sprite_height / 2 + Time.deltaTime * gravity > ray_collide_up_l.point.y)
+                            {
+                                if (!ray_collide_up_l.collider.gameObject.GetComponent<GoThroughPlatform>().IsGoThrough)
+                                {
+                                    this.transform.Translate(new Vector3(0, ray_collide_up_l.point.y - transform.position.y - sprite_height / 2, 0));
+                                    jump_on = false;
+                                    toStayUp = true;
+                                }
+                                else
+                                {
+                                    this.transform.position = new Vector3(this.transform.position.x,
+                                                                      ray_collide_up_l.collider.gameObject.transform.position.y + sprite_height / 2 + ray_collide_up_l.collider.gameObject.GetComponent<Renderer>().bounds.size[1]
+                                                                      , this.transform.position.z);
+                                }
+                            }
+                            else
+                            {
+                                this.transform.Translate(new Vector3(0, Time.deltaTime * gravity, 0));
+                            }
+                        
                     }
                     else
                     {
-                        if (transform.position.y + sprite_height / 2 + Time.deltaTime * gravity > ray_collide_up_r.point.y)
-                        {
-                            this.transform.Translate(new Vector3(0, ray_collide_up_r.point.y - transform.position.y - sprite_height / 2, 0));
-                            jump_on = false;
-                            toStayUp = true;
-                        }
-                        else
-                        {
-                            this.transform.Translate(new Vector3(0, Time.deltaTime * gravity, 0));
-                        }
+                        
+                            if (transform.position.y + sprite_height / 2 + Time.deltaTime * gravity > ray_collide_up_r.point.y)
+                            {
+                                if (!ray_collide_up_r.collider.gameObject.GetComponent<GoThroughPlatform>().IsGoThrough)
+                                {
+                                    this.transform.Translate(new Vector3(0, ray_collide_up_r.point.y - transform.position.y - sprite_height / 2, 0));
+                                    jump_on = false;
+                                    toStayUp = true;
+                                }
+                                else
+                                {
+                                    this.transform.position = new Vector3(this.transform.position.x,
+                                                                      ray_collide_up_r.collider.gameObject.transform.position.y + sprite_height / 2 + ray_collide_up_r.collider.gameObject.GetComponent<Renderer>().bounds.size[1]
+                                                                      , this.transform.position.z);
+                                }
+                            }
+                            else
+                            {
+                                this.transform.Translate(new Vector3(0, Time.deltaTime * gravity, 0));
+                            }
+                        
                     }
                 }
                 else
                 {
-                    jump_on = false;
-                    toStayUp = true;
+                        jump_on = false;
+                        toStayUp = true;
                 }
             }
             else
