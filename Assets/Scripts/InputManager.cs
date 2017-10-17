@@ -16,17 +16,10 @@ public class InputManager : MonoBehaviour {
         if(horizontal_axis != 0)
         {
             this.GetComponent<GravityManager>().Horizontal_Move(horizontal_axis);
-        }	
-
-        if(Input.GetButtonDown("Dash"))
-        {
-            this.GetComponent<GravityManager>().Set_Dash(true);
         }
 
-        if(Input.GetButtonUp("Dash"))
-        {
-            this.GetComponent<GravityManager>().Set_Dash(false);
-        }
+        this.GetComponent<GravityManager>().Set_Dash(Input.GetButton("Dash"));
+
 
         if(Input.GetButtonDown("Jump"))
         {

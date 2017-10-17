@@ -28,6 +28,9 @@ public class GravityManager : MonoBehaviour
     [SerializeField]
     private float distance_glue_wall;
 
+    [SerializeField]
+    private float acceleration_dash;
+
     private bool toStayUp = false;
     private float gravity_to_use;
     private float speed_to_use;
@@ -89,13 +92,40 @@ public class GravityManager : MonoBehaviour
 
     public void Set_Dash(bool toActivate)
     {
-        if (toActivate)
+        if(!(verif_collision(ray_collide_down_l, (sprite_height / 2), false) && verif_collision(ray_collide_down_r, (sprite_height / 2), false)))
         {
-            speed_to_use = speed_horizontal_dash;
+            if (toActivate)
+            {
+                    speed_to_use += Time.deltaTime*acceleration_dash;
+                    if (speed_to_use > speed_horizontal_dash)
+                    {
+                        speed_to_use = speed_horizontal_dash;
+                    }
+            }
+            else
+            {
+                speed_to_use -=3*  Time.deltaTime * acceleration_dash;
+                if (speed_to_use < speed_horizontal)
+                {
+                    speed_to_use = speed_horizontal;
+                }
+            }
         }
         else
         {
-            speed_to_use = speed_horizontal;
+            if(!toActivate)
+            {
+                speed_to_use -= 3* Time.deltaTime * acceleration_dash;
+                if (speed_to_use < speed_horizontal)
+                {
+                    speed_to_use = speed_horizontal;
+                }
+            }
+        }
+
+        if(gravity_to_use == gravity_wall && toActivate)
+        {
+            speed_to_use = speed_horizontal_dash;
         }
     }
     public void horizontal_movement_regarding_ray(RaycastHit2D ray, float total_speed,float isRight)
