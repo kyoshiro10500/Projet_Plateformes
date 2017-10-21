@@ -52,22 +52,35 @@ public class VerticalPlateforme : MonoBehaviour {
 	void Update () {
         if(is_horizontal)
         {
-            if (this.transform.position.x <= min_hauteur || this.transform.position.x >= min_hauteur + max_amplitude)
+            if (this.transform.position.x <= min_hauteur)
             {
                 vitesse = -vitesse;
                 vitesse_horizontale = vitesse;
+                this.transform.position = new Vector3(min_hauteur, this.transform.position.y, this.transform.position.z);
+            }
+            else if (this.transform.position.x > min_hauteur + max_amplitude)
+            {
+                vitesse = -vitesse;
+                vitesse_horizontale = vitesse;
+                this.transform.position = new Vector3(min_hauteur + max_amplitude,this.transform.position.y, this.transform.position.z);
             }
 
             this.transform.Translate(new Vector3(Time.deltaTime * vitesse, 0, 0));
         }
         else
         {
-            if (this.transform.position.y <= min_hauteur || this.transform.position.y >= min_hauteur + max_amplitude)
+            if (this.transform.position.y < min_hauteur)
             {
                 vitesse = -vitesse;
                 vitesse_verticale = vitesse;
+                this.transform.position = new Vector3(this.transform.position.x, min_hauteur, this.transform.position.z);
             }
-
+            else if (this.transform.position.y > min_hauteur + max_amplitude)
+            {
+                vitesse = -vitesse;
+                vitesse_verticale = vitesse;
+                this.transform.position = new Vector3(this.transform.position.x, min_hauteur+max_amplitude, this.transform.position.z);
+            }
             this.transform.Translate(new Vector3(0, Time.deltaTime * vitesse, 0));
         }
 	}

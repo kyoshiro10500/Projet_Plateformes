@@ -75,9 +75,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\GoThroughPlatform.cs" />
     <Compile Include="Assets\Scripts\GravityManager.cs" />
     <Compile Include="Assets\Scripts\InputManager.cs" />
+    <Compile Include="Assets\Scripts\PropertyPlatform.cs" />
     <Compile Include="Assets\Scripts\VerticalPlateforme.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
