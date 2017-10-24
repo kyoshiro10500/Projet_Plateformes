@@ -205,6 +205,18 @@ public class GravityManager : MonoBehaviour
         make_movement_horizontal(horizontal_axis * speed_to_use);
     }
 
+    public void GoThroughPlatformDown()
+    {
+        if(ray_collide_down_l.collider.gameObject.GetComponent<PropertyPlatform>() != null && Mathf.Abs(transform.position.y- ray_collide_down_l.point.y) < sprite_width/2 &&
+            ray_collide_down_r.collider.gameObject.GetComponent<PropertyPlatform>() != null && Mathf.Abs(transform.position.y - ray_collide_down_r.point.y) < sprite_width / 2)
+        {
+            if(ray_collide_down_l.collider.gameObject.GetComponent<PropertyPlatform>().IsGoThrough && ray_collide_down_r.collider.gameObject.GetComponent<PropertyPlatform>().IsGoThrough)
+            {
+                transform.position = new Vector3(transform.position.x, ray_collide_down_l.collider.gameObject.transform.position.y - ray_collide_down_r.collider.GetComponent<Renderer>().bounds.size[1] / 2 - sprite_height / 2, transform.position.z);
+            }
+        }
+    }
+
     public void calculateRay()
     {
         Vector3 pos = this.transform.position;
@@ -301,6 +313,15 @@ public class GravityManager : MonoBehaviour
                     make_movement_horizontal(ray_collide_down_l.collider.gameObject.GetComponent<VerticalPlateforme>().Vitesse_horizontale);
                     
                 }
+                else if (ray_collide_down_l.collider.gameObject.GetComponent<VerticalPlateforme>() != null && (Mathf.Abs(transform.position.y - ray_collide_down_l.point.y) <= sprite_height / 2) && ray_collide_down_l.collider.gameObject.GetComponent<VerticalPlateforme>().Vitesse_verticale > 0)
+                {
+                    if (ray_collide_down_l.collider.gameObject.GetComponent<VerticalPlateforme>().Vitesse_verticale != 0)
+                    {
+                        this.transform.position = new Vector3(transform.position.x,
+                                               (ray_collide_down_l.collider.gameObject.transform.position.y + sprite_height / 2 + ray_collide_down_l.collider.gameObject.GetComponent<Renderer>().bounds.size[1] / 2),
+                                                transform.position.z);
+                    }
+                }
                 else if (ray_collide_down_r.collider.gameObject.GetComponent<VerticalPlateforme>() != null && (Mathf.Abs(transform.position.y - ray_collide_down_l.point.y) > sprite_height/2))
                 {
                     if (ray_collide_down_r.collider.gameObject.GetComponent<VerticalPlateforme>().Vitesse_verticale != 0)
@@ -310,6 +331,12 @@ public class GravityManager : MonoBehaviour
                                                 transform.position.z);
                     }
                     make_movement_horizontal(ray_collide_down_r.collider.gameObject.GetComponent<VerticalPlateforme>().Vitesse_horizontale);
+                }
+                else if (ray_collide_down_r.collider.gameObject.GetComponent<VerticalPlateforme>() != null && (Mathf.Abs(transform.position.y - ray_collide_down_r.point.y) <= sprite_height / 2) && ray_collide_down_r.collider.gameObject.GetComponent<VerticalPlateforme>().Vitesse_verticale > 0)
+                {
+                        this.transform.position = new Vector3(transform.position.x,
+                                               (ray_collide_down_r.collider.gameObject.transform.position.y + sprite_height / 2 + ray_collide_down_r.collider.gameObject.GetComponent<Renderer>().bounds.size[1] / 2),
+                                                transform.position.z);
                 }
             }
         }

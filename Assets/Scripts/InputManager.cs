@@ -18,6 +18,13 @@ public class InputManager : MonoBehaviour {
             this.GetComponent<GravityManager>().Horizontal_Move(horizontal_axis);
         }
 
+        float vertical_axis = 0f;
+        vertical_axis = Input.GetAxisRaw("Vertical");
+        if (vertical_axis < -0.7f)
+        {
+            this.GetComponent<GravityManager>().GoThroughPlatformDown();
+        }
+
         this.GetComponent<GravityManager>().Set_Dash(Input.GetButton("Dash"));
 
 
