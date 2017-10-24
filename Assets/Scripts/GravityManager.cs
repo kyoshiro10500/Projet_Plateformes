@@ -512,5 +512,14 @@ public class GravityManager : MonoBehaviour
             }
         }
 
+        if(ray_collide_up_l.collider.gameObject.GetComponent<VerticalPlateforme>() != null && Mathf.Abs(transform.position.y - ray_collide_up_l.point.y) <= sprite_height / 2 && ray_collide_up_l.collider.gameObject.GetComponent<VerticalPlateforme>().Vitesse_verticale < 0)
+        {
+            transform.position = new Vector3(transform.position.x, ray_collide_up_l.collider.gameObject.transform.position.y - ray_collide_up_l.collider.gameObject.GetComponent<Renderer>().bounds.size[1]/2 - sprite_width/2 - 0.1f, transform.position.z);
+        }
+        else if(ray_collide_up_r.collider.gameObject.GetComponent<VerticalPlateforme>() != null && Mathf.Abs(transform.position.y - ray_collide_up_r.point.y) <= sprite_height / 2 && ray_collide_up_r.collider.gameObject.GetComponent<VerticalPlateforme>().Vitesse_verticale < 0)
+        {
+            transform.position = new Vector3(transform.position.x, ray_collide_up_r.collider.gameObject.transform.position.y - ray_collide_up_r.collider.gameObject.GetComponent<Renderer>().bounds.size[1] / 2 - sprite_width / 2 - 0.1f, transform.position.z);
+        }
+
     }
 }
