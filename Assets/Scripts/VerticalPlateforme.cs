@@ -98,12 +98,29 @@ public class VerticalPlateforme : MonoBehaviour {
         }
         else
         {
-            if(Chrono < TimeStayAtExtremity)
+            if(is_horizontal)
+            {
+                vitesse_horizontale = 0;
+            }
+            else
+            {
+                vitesse_verticale = 0;
+            }
+            
+            if (Chrono < TimeStayAtExtremity)
             {
                 Chrono += Time.deltaTime;
             }
             else
             {
+                if (is_horizontal)
+                {
+                    vitesse_horizontale = vitesse;
+                }
+                else
+                {
+                    vitesse_verticale = vitesse;
+                }
                 Chrono = 0f;
                 toWait = false;
             }
