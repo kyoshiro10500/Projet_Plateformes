@@ -10,6 +10,12 @@ public class VerticalPlateforme : MonoBehaviour {
     [SerializeField]
     private float vitesse;
 
+    [SerializeField]
+    private float TimeStayAtExtremity;
+
+    private float Chrono =0f;
+    bool toWait;
+
     private float vitesse_horizontale = 0;
     public float Vitesse_horizontale
     {
@@ -50,38 +56,58 @@ public class VerticalPlateforme : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        if(is_horizontal)
+        if(!toWait)
         {
-            if (this.transform.position.x <= min_hauteur)
+            if (is_horizontal)
             {
-                vitesse = -vitesse;
-                vitesse_horizontale = vitesse;
-                this.transform.position = new Vector3(min_hauteur, this.transform.position.y, this.transform.position.z);
-            }
-            else if (this.transform.position.x > min_hauteur + max_amplitude)
-            {
-                vitesse = -vitesse;
-                vitesse_horizontale = vitesse;
-                this.transform.position = new Vector3(min_hauteur + max_amplitude,this.transform.position.y, this.transform.position.z);
-            }
+                if (this.transform.position.x <= min_hauteur)
+                {
+                    vitesse = -vitesse;
+                    vitesse_horizontale = vitesse;
+                    this.transform.position = new Vector3(min_hauteur, this.transform.position.y, this.transform.position.z);
+                    toWait = true;
+                }
+                else if (this.transform.position.x > min_hauteur + max_amplitude)
+                {
+                    vitesse = -vitesse;
+                    vitesse_horizontale = vitesse;
+                    this.transform.position = new Vector3(min_hauteur + max_amplitude, this.transform.position.y, this.transform.position.z);
+                    toWait = true;
+                }
 
-            this.transform.Translate(new Vector3(Time.deltaTime * vitesse, 0, 0));
+                this.transform.Translate(new Vector3(Time.deltaTime * vitesse, 0, 0));
+            }
+            else
+            {
+                if (this.transform.position.y < min_hauteur)
+                {
+                    vitesse = -vitesse;
+                    vitesse_verticale = vitesse;
+                    this.transform.position = new Vector3(this.transform.position.x, min_hauteur, this.transform.position.z);
+                    toWait = true;
+                }
+                else if (this.transform.position.y > min_hauteur + max_amplitude)
+                {
+                    vitesse = -vitesse;
+                    vitesse_verticale = vitesse;
+                    this.transform.position = new Vector3(this.transform.position.x, min_hauteur + max_amplitude, this.transform.position.z);
+                    toWait = true;
+                }
+                this.transform.Translate(new Vector3(0, Time.deltaTime * vitesse, 0));
+            }
         }
         else
         {
-            if (this.transform.position.y < min_hauteur)
+            if(Chrono < TimeStayAtExtremity)
             {
-                vitesse = -vitesse;
-                vitesse_verticale = vitesse;
-                this.transform.position = new Vector3(this.transform.position.x, min_hauteur, this.transform.position.z);
+                Chrono += Time.deltaTime;
             }
-            else if (this.transform.position.y > min_hauteur + max_amplitude)
+            else
             {
-                vitesse = -vitesse;
-                vitesse_verticale = vitesse;
-                this.transform.position = new Vector3(this.transform.position.x, min_hauteur+max_amplitude, this.transform.position.z);
+                Chrono = 0f;
+                toWait = false;
             }
-            this.transform.Translate(new Vector3(0, Time.deltaTime * vitesse, 0));
         }
-	}
+    }
+       
 }

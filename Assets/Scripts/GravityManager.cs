@@ -70,7 +70,6 @@ public class GravityManager : MonoBehaviour
     {
         if (toActivate && number_jump < 2f)
         {
-            Debug.Log(gravity_to_use);
             if (gravity_to_use == gravity)
             {
                 number_jump++;
@@ -394,7 +393,7 @@ public class GravityManager : MonoBehaviour
                                     if (ray_collide_up_r.collider.gameObject.GetComponent<PropertyPlatform>().IsKillPlayer)
                                     {
                                         this.transform.position = spawn_position;
-                                    }
+                                }
                                     else
                                     {
                                         this.transform.Translate(new Vector3(0, ray_collide_up_r.point.y - transform.position.y - sprite_height / 2, 0));
@@ -448,8 +447,8 @@ public class GravityManager : MonoBehaviour
         if ((ray_collide_left_u.collider != null && Mathf.Abs(ray_collide_left_u.point.x - transform.position.x) <= (sprite_width / 2) + distance_glue_wall)
                 || (ray_collide_left_d.collider != null && Mathf.Abs(ray_collide_left_d.point.x - transform.position.x) <= (sprite_width / 2) + distance_glue_wall))
         {
-            if((ray_collide_left_u.collider != null && ray_collide_left_u.collider.gameObject.GetComponent<PropertyPlatform>().IsKillPlayer)
-                || (ray_collide_left_d.collider != null && ray_collide_left_d.collider.gameObject.GetComponent<PropertyPlatform>().IsKillPlayer))
+            if((ray_collide_left_u.collider != null && ray_collide_left_u.collider.gameObject.GetComponent<PropertyPlatform>().IsKillPlayer && Mathf.Abs(ray_collide_left_u.point.x - transform.position.x) <= (sprite_width / 2))
+                || (ray_collide_left_d.collider != null && ray_collide_left_d.collider.gameObject.GetComponent<PropertyPlatform>().IsKillPlayer) && Mathf.Abs(ray_collide_left_d.point.x - transform.position.x) <= (sprite_width / 2))
             {
                 this.transform.position = spawn_position;
             }
@@ -464,8 +463,8 @@ public class GravityManager : MonoBehaviour
             if ((ray_collide_right_u.collider != null && Mathf.Abs(ray_collide_right_u.point.x - transform.position.x) <= (sprite_width / 2) + distance_glue_wall)
                 || (ray_collide_right_d.collider != null && Mathf.Abs(ray_collide_right_d.point.x - transform.position.x) <= (sprite_width / 2) + distance_glue_wall))
             {
-                if ((ray_collide_right_u.collider != null && ray_collide_right_u.collider.gameObject.GetComponent<PropertyPlatform>().IsKillPlayer)
-                || (ray_collide_right_d.collider != null && ray_collide_right_d.collider.gameObject.GetComponent<PropertyPlatform>().IsKillPlayer))
+                if ((ray_collide_right_u.collider != null && ray_collide_right_u.collider.gameObject.GetComponent<PropertyPlatform>().IsKillPlayer && Mathf.Abs(ray_collide_right_u.point.x - transform.position.x) <= (sprite_width / 2))
+                || (ray_collide_right_d.collider != null && ray_collide_right_d.collider.gameObject.GetComponent<PropertyPlatform>().IsKillPlayer) && Mathf.Abs(ray_collide_right_d.point.x - transform.position.x) <= (sprite_width / 2))
                 {
                     this.transform.position = spawn_position;
                 }
