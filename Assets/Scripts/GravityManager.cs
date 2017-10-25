@@ -12,6 +12,9 @@ public class GravityManager : MonoBehaviour
     [SerializeField]
     private float gravity_wall;
 
+    [SerializeField]
+    private float time_stay_up;
+
     [Header("Player")]
     [SerializeField]
     private Vector3 spawn_position;
@@ -25,14 +28,18 @@ public class GravityManager : MonoBehaviour
     [SerializeField]
     private float jump_height;
 
-    [SerializeField]
-    private float time_stay_up;
-
+    
     [SerializeField]
     private float distance_glue_wall;
 
     [SerializeField]
     private float acceleration_dash;
+
+    [SerializeField]
+    private float time_wall_jump_effect;
+
+    [SerializeField]
+    private float impulsion_wall_jump;
 
     private bool toStayUp = false;
     private float gravity_to_use;
@@ -42,6 +49,18 @@ public class GravityManager : MonoBehaviour
     private float jump_height_reached = 0;
     private float number_jump = 0f;
     private float time_up = 0;
+    private float wall_jump_speed = 0;
+    private float Chrono_wall = 0;
+    private bool toDoWallJump = false;
+    public bool ToDoWallJump
+    {
+        get
+        {
+            return toDoWallJump;
+        }
+    }
+    private bool isAgainstRightWall = false;
+    private float time_to_use = 0f;
 
     private RaycastHit2D ray_collide_down_l;
     private RaycastHit2D ray_collide_down_r;
@@ -70,13 +89,15 @@ public class GravityManager : MonoBehaviour
     {
         if (toActivate && number_jump < 2f)
         {
-            if (gravity_to_use == gravity)
+            if (gravity_to_use == gravity || (gravity_to_use == gravity_wall && ((ray_collide_down_l.collider != null && Mathf.Abs(transform.position.y - ray_collide_down_l.point.y) <= sprite_width/2)
+                                                                                || (ray_collide_down_r.collider != null && Mathf.Abs(transform.position.y - ray_collide_down_r.point.y) <= sprite_width / 2))))
             {
                 number_jump++;
             }
             else
             {
-                //implémenter ici le comportement du wall_jump
+                toDoWallJump = true;
+                Chrono_wall = 0;
             }
             jump_on = true;
             toStayUp = false;
@@ -454,7 +475,12 @@ public class GravityManager : MonoBehaviour
             }
             else
             {
+                isAgainstRightWall = true;
                 gravity_to_use = gravity_wall;
+                if (Chrono_wall > 0.05)
+                {
+                    toDoWallJump = false;
+                }
                 number_jump = 1;
             }
         }
@@ -470,7 +496,12 @@ public class GravityManager : MonoBehaviour
                 }
                 else
                 {
+                    isAgainstRightWall = false;
                     gravity_to_use = gravity_wall;
+                    if(Chrono_wall > 0.05)
+                    {
+                        toDoWallJump = false;
+                    }
                     number_jump = 1;
                 }
             }
@@ -518,6 +549,36 @@ public class GravityManager : MonoBehaviour
         else if(ray_collide_up_r.collider.gameObject.GetComponent<VerticalPlateforme>() != null && Mathf.Abs(transform.position.y - ray_collide_up_r.point.y) <= sprite_height / 2 && ray_collide_up_r.collider.gameObject.GetComponent<VerticalPlateforme>().Vitesse_verticale < 0)
         {
             transform.position = new Vector3(transform.position.x, ray_collide_up_r.collider.gameObject.transform.position.y - ray_collide_up_r.collider.gameObject.GetComponent<Renderer>().bounds.size[1] / 2 - sprite_width / 2 - 0.1f, transform.position.z);
+        }
+
+        if (toDoWallJump)
+        {
+            if(Chrono_wall == 0)
+            {
+                time_to_use = time_wall_jump_effect;
+                if (speed_to_use == speed_horizontal_dash)
+                {
+                    time_to_use /= 2;
+                }
+            }
+            
+            if (Chrono_wall < time_to_use)
+            {
+                Chrono_wall += Time.deltaTime;
+                if(isAgainstRightWall)
+                {
+                    make_movement_horizontal(impulsion_wall_jump*speed_to_use);
+                }
+                else
+                {
+                    make_movement_horizontal(-impulsion_wall_jump*speed_to_use);
+                }
+            }
+            else
+            {
+                Chrono_wall = 0;
+                toDoWallJump = false;
+            }
         }
 
     }

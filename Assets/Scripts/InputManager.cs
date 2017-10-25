@@ -13,7 +13,7 @@ public class InputManager : MonoBehaviour {
 	void Update () {
         float horizontal_axis = 0f;
         horizontal_axis = Input.GetAxisRaw("Horizontal");
-        if(horizontal_axis != 0)
+        if(horizontal_axis != 0 && !GetComponent<GravityManager>().ToDoWallJump)
         {
             this.GetComponent<GravityManager>().Horizontal_Move(horizontal_axis);
         }
