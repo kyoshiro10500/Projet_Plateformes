@@ -249,6 +249,7 @@ public class GravityManager : MonoBehaviour
         ray_collide_right_u = Physics2D.Raycast(new Vector3(pos[0], pos[1] + (sprite_height / 2) - 0.001f, pos[2]), Vector3.right);
         ray_collide_right_d = Physics2D.Raycast(new Vector3(pos[0], pos[1] - (sprite_height / 2) + 0.001f, pos[2]), Vector3.right);
     }
+    
     // Update is called once per frame
     private void LateUpdate()
     {
@@ -571,6 +572,5 @@ public class GravityManager : MonoBehaviour
                 toDoWallJump = false;
             }
         }
-
     }
 }
