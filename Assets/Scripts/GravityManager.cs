@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class GravityManager : MonoBehaviour
 {
-
     [Header("Engine")]
     [SerializeField]
     private float gravity;
@@ -27,7 +26,6 @@ public class GravityManager : MonoBehaviour
 
     [SerializeField]
     private float jump_height;
-
 
     [SerializeField]
     private float distance_glue_wall;
@@ -85,6 +83,42 @@ public class GravityManager : MonoBehaviour
         gravity_to_use = gravity;
     }
 
+
+    public bool verif_collision2(RaycastHit2D ray, float condition_distance, bool selonX)
+    {
+        if (selonX)
+        {
+            return (ray.collider != null && Mathf.Abs(ray.point.x - transform.position.x) <= condition_distance);
+        }
+        else
+        {
+            return (ray.collider != null && Mathf.Abs(ray.point.y - transform.position.y) <= condition_distance);
+        }
+    }
+
+
+    public bool isSmashed()
+    {
+        //Collision droite-gauche
+        if ((verif_collision2(ray_collide_right_u, sprite_width/2, true) || verif_collision2(ray_collide_left_u, sprite_width / 2, true))
+        && (verif_collision2(ray_collide_right_d, sprite_width / 2, true) || verif_collision2(ray_collide_left_d, sprite_width / 2, true) ) )
+        {
+            Debug.Log("isSmashed - droite/gauche");
+            this.transform.position = spawn_position;
+            return true;
+        }
+
+        //Collision haut-bas
+        if( (verif_collision2(ray_collide_up_l, sprite_height/2, false) || verif_collision2(ray_collide_up_l, sprite_height/2, false) )
+        && (verif_collision2(ray_collide_down_r, (sprite_height/2), false) || verif_collision2(ray_collide_down_r, (sprite_height/2), false) ) )
+        {
+            Debug.Log("isSmashed - haut/bas");
+            this.transform.position = spawn_position;
+            return true;
+        }
+        return false;
+    }
+
     public void Set_Jump(bool toActivate)
     {
         if (toActivate && number_jump < 2f)
@@ -114,7 +148,6 @@ public class GravityManager : MonoBehaviour
             jump_on = false;
         }
     }
-
     public void Set_Dash(bool toActivate)
     {
         if (!(verif_collision(ray_collide_down_l, (sprite_height / 2), false) && verif_collision(ray_collide_down_r, (sprite_height / 2), false)))
@@ -179,7 +212,6 @@ public class GravityManager : MonoBehaviour
             this.transform.Translate(new Vector3(Time.deltaTime * total_speed, 0, 0));
         }
     }
-
     public bool verif_collision(RaycastHit2D ray, float condition_distance, bool selonX)
     {
         if (selonX)
@@ -192,7 +224,6 @@ public class GravityManager : MonoBehaviour
         }
 
     }
-
     public void make_movement_horizontal(float total_speed)
     {
         if ((total_speed > 0 && verif_collision(ray_collide_right_u, (sprite_width / 2), true)) && (total_speed > 0 && verif_collision(ray_collide_right_d, (sprite_width / 2), true)))
@@ -219,12 +250,10 @@ public class GravityManager : MonoBehaviour
             }
         }
     }
-
     public void Horizontal_Move(float horizontal_axis)
     {
         make_movement_horizontal(horizontal_axis * speed_to_use);
     }
-
     public void GoThroughPlatformDown()
     {
         if (ray_collide_down_l.collider.gameObject.GetComponent<PropertyPlatform>() != null && Mathf.Abs(transform.position.y - ray_collide_down_l.point.y) < sprite_width / 2 &&
@@ -236,7 +265,6 @@ public class GravityManager : MonoBehaviour
             }
         }
     }
-
     public void calculateRay()
     {
         Vector3 pos = this.transform.position;
@@ -249,8 +277,6 @@ public class GravityManager : MonoBehaviour
         ray_collide_right_u = Physics2D.Raycast(new Vector3(pos[0], pos[1] + (sprite_height / 2) - 0.001f, pos[2]), Vector3.right);
         ray_collide_right_d = Physics2D.Raycast(new Vector3(pos[0], pos[1] - (sprite_height / 2) + 0.001f, pos[2]), Vector3.right);
     }
-    
-    // Update is called once per frame
     private void LateUpdate()
     {
         calculateRay();
@@ -258,39 +284,20 @@ public class GravityManager : MonoBehaviour
 
     void Update()
     {
-        calculateRay();
-        if ((ray_collide_left_u.collider != null && Mathf.Abs(ray_collide_left_u.point.x - transform.position.x) <= (sprite_width / 2) + distance_glue_wall)
-               || (ray_collide_left_d.collider != null && Mathf.Abs(ray_collide_left_d.point.x - transform.position.x) <= (sprite_width / 2) + distance_glue_wall))
+        if (!isSmashed())
         {
-            if ((ray_collide_left_u.collider != null && ray_collide_left_u.collider.gameObject.GetComponent<PropertyPlatform>().IsKillPlayer && Mathf.Abs(ray_collide_left_u.point.x - transform.position.x) <= (sprite_width / 2))
-                || (ray_collide_left_d.collider != null && ray_collide_left_d.collider.gameObject.GetComponent<PropertyPlatform>().IsKillPlayer) && Mathf.Abs(ray_collide_left_d.point.x - transform.position.x) <= (sprite_width / 2))
+            calculateRay();
+            if ((ray_collide_left_u.collider != null && Mathf.Abs(ray_collide_left_u.point.x - transform.position.x) <= (sprite_width / 2) + distance_glue_wall)
+                   || (ray_collide_left_d.collider != null && Mathf.Abs(ray_collide_left_d.point.x - transform.position.x) <= (sprite_width / 2) + distance_glue_wall))
             {
-                this.transform.position = spawn_position;
-            }
-            else
-            {
-                isAgainstRightWall = true;
-                gravity_to_use = gravity_wall;
-                if (Chrono_wall > 0.05)
-                {
-                    toDoWallJump = false;
-                }
-                number_jump = 1;
-            }
-        }
-        else
-        {
-            if ((ray_collide_right_u.collider != null && Mathf.Abs(ray_collide_right_u.point.x - transform.position.x) <= (sprite_width / 2) + distance_glue_wall)
-                || (ray_collide_right_d.collider != null && Mathf.Abs(ray_collide_right_d.point.x - transform.position.x) <= (sprite_width / 2) + distance_glue_wall))
-            {
-                if ((ray_collide_right_u.collider != null && ray_collide_right_u.collider.gameObject.GetComponent<PropertyPlatform>().IsKillPlayer && Mathf.Abs(ray_collide_right_u.point.x - transform.position.x) <= (sprite_width / 2))
-                || (ray_collide_right_d.collider != null && ray_collide_right_d.collider.gameObject.GetComponent<PropertyPlatform>().IsKillPlayer) && Mathf.Abs(ray_collide_right_d.point.x - transform.position.x) <= (sprite_width / 2))
+                if ((ray_collide_left_u.collider != null && ray_collide_left_u.collider.gameObject.GetComponent<PropertyPlatform>().IsKillPlayer && Mathf.Abs(ray_collide_left_u.point.x - transform.position.x) <= (sprite_width / 2))
+                    || (ray_collide_left_d.collider != null && ray_collide_left_d.collider.gameObject.GetComponent<PropertyPlatform>().IsKillPlayer) && Mathf.Abs(ray_collide_left_d.point.x - transform.position.x) <= (sprite_width / 2))
                 {
                     this.transform.position = spawn_position;
                 }
                 else
                 {
-                    isAgainstRightWall = false;
+                    isAgainstRightWall = true;
                     gravity_to_use = gravity_wall;
                     if (Chrono_wall > 0.05)
                     {
@@ -301,275 +308,297 @@ public class GravityManager : MonoBehaviour
             }
             else
             {
-                gravity_to_use = gravity;
-            }
-        }
-
-        if (!jump_on && !toStayUp)
-        {
-            if (verif_collision(ray_collide_down_l, (sprite_height / 2), false) && verif_collision(ray_collide_down_r, (sprite_height / 2), false))
-            {
-                if (ray_collide_down_l.point.y >= ray_collide_down_r.point.y)
+                if ((ray_collide_right_u.collider != null && Mathf.Abs(ray_collide_right_u.point.x - transform.position.x) <= (sprite_width / 2) + distance_glue_wall)
+                    || (ray_collide_right_d.collider != null && Mathf.Abs(ray_collide_right_d.point.x - transform.position.x) <= (sprite_width / 2) + distance_glue_wall))
                 {
-                    if (transform.position.y - sprite_height / 2 - Time.deltaTime * gravity_to_use < ray_collide_down_l.point.y)
+                    if ((ray_collide_right_u.collider != null && ray_collide_right_u.collider.gameObject.GetComponent<PropertyPlatform>().IsKillPlayer && Mathf.Abs(ray_collide_right_u.point.x - transform.position.x) <= (sprite_width / 2))
+                    || (ray_collide_right_d.collider != null && ray_collide_right_d.collider.gameObject.GetComponent<PropertyPlatform>().IsKillPlayer) && Mathf.Abs(ray_collide_right_d.point.x - transform.position.x) <= (sprite_width / 2))
                     {
-                        if (ray_collide_down_l.collider.gameObject.GetComponent<PropertyPlatform>().IsKillPlayer)
+                        this.transform.position = spawn_position;
+                    }
+                    else
+                    {
+                        isAgainstRightWall = false;
+                        gravity_to_use = gravity_wall;
+                        if (Chrono_wall > 0.05)
                         {
-                            this.transform.position = spawn_position;
+                            toDoWallJump = false;
+                        }
+                        number_jump = 1;
+                    }
+                }
+                else
+                {
+                    gravity_to_use = gravity;
+                }
+            }
+
+            if (!jump_on && !toStayUp)
+            {
+                if (verif_collision(ray_collide_down_l, (sprite_height / 2), false) && verif_collision(ray_collide_down_r, (sprite_height / 2), false))
+                {
+                    if (ray_collide_down_l.point.y >= ray_collide_down_r.point.y)
+                    {
+                        if (transform.position.y - sprite_height / 2 - Time.deltaTime * gravity_to_use < ray_collide_down_l.point.y)
+                        {
+                            if (ray_collide_down_l.collider.gameObject.GetComponent<PropertyPlatform>().IsKillPlayer)
+                            {
+                                this.transform.position = spawn_position;
+                            }
+                            else
+                            {
+                                this.transform.Translate(new Vector3(0, -(transform.position.y - ray_collide_down_l.point.y - sprite_height / 2), 0));
+                                number_jump = 0f;
+                            }
                         }
                         else
                         {
-                            this.transform.Translate(new Vector3(0, -(transform.position.y - ray_collide_down_l.point.y - sprite_height / 2), 0));
-                            number_jump = 0f;
+                            this.transform.Translate(new Vector3(0, -Time.deltaTime * gravity_to_use, 0));
+                            if (number_jump < 1)
+                            {
+                                number_jump = 1;
+                            }
                         }
                     }
                     else
                     {
-                        this.transform.Translate(new Vector3(0, -Time.deltaTime * gravity_to_use, 0));
-                        if (number_jump < 1)
+                        if (transform.position.y - sprite_height / 2 - Time.deltaTime * gravity_to_use < ray_collide_down_r.point.y)
                         {
-                            number_jump = 1;
+                            if (ray_collide_down_r.collider.gameObject.GetComponent<PropertyPlatform>().IsKillPlayer)
+                            {
+                                this.transform.position = spawn_position;
+                            }
+                            else
+                            {
+                                this.transform.Translate(new Vector3(0, -(transform.position.y - ray_collide_down_r.point.y - sprite_height / 2), 0));
+                                number_jump = 0f;
+                            }
+                        }
+                        else
+                        {
+                            this.transform.Translate(new Vector3(0, -Time.deltaTime * gravity_to_use, 0));
+                            if (number_jump < 1)
+                            {
+                                number_jump = 1;
+                            }
                         }
                     }
                 }
                 else
                 {
-                    if (transform.position.y - sprite_height / 2 - Time.deltaTime * gravity_to_use < ray_collide_down_r.point.y)
+                    number_jump = 0f;
+                    if (ray_collide_down_r.collider.gameObject.GetComponent<VerticalPlateforme>() != null && ray_collide_down_l.collider.gameObject.GetComponent<VerticalPlateforme>() != null)
                     {
-                        if (ray_collide_down_r.collider.gameObject.GetComponent<PropertyPlatform>().IsKillPlayer)
-                        {
-                            this.transform.position = spawn_position;
-                        }
-                        else
-                        {
-                            this.transform.Translate(new Vector3(0, -(transform.position.y - ray_collide_down_r.point.y - sprite_height / 2), 0));
-                            number_jump = 0f;
-                        }
-                    }
-                    else
-                    {
-                        this.transform.Translate(new Vector3(0, -Time.deltaTime * gravity_to_use, 0));
-                        if (number_jump < 1)
-                        {
-                            number_jump = 1;
-                        }
-                    }
-                }
-            }
-            else
-            {
-                number_jump = 0f;
-                if (ray_collide_down_r.collider.gameObject.GetComponent<VerticalPlateforme>() != null && ray_collide_down_l.collider.gameObject.GetComponent<VerticalPlateforme>() != null)
-                {
                         this.transform.position = new Vector3(transform.position.x,
                                                (ray_collide_down_r.collider.gameObject.transform.position.y + sprite_height / 2 + ray_collide_down_r.collider.gameObject.GetComponent<Renderer>().bounds.size[1] / 2 + +Time.deltaTime * ray_collide_down_r.collider.gameObject.GetComponent<VerticalPlateforme>().Vitesse_verticale),
                                                 transform.position.z);
-                    make_movement_horizontal(ray_collide_down_r.collider.gameObject.GetComponent<VerticalPlateforme>().Vitesse_horizontale);
-                }
-                else if (ray_collide_down_l.collider.gameObject.GetComponent<VerticalPlateforme>() != null && (Mathf.Abs(transform.position.y - ray_collide_down_r.point.y) > sprite_height / 2))
-                {
+                        make_movement_horizontal(ray_collide_down_r.collider.gameObject.GetComponent<VerticalPlateforme>().Vitesse_horizontale);
+                    }
+                    else if (ray_collide_down_l.collider.gameObject.GetComponent<VerticalPlateforme>() != null && (Mathf.Abs(transform.position.y - ray_collide_down_r.point.y) > sprite_height / 2))
+                    {
                         this.transform.position = new Vector3(transform.position.x,
                                                (ray_collide_down_l.collider.gameObject.transform.position.y + sprite_height / 2 + ray_collide_down_l.collider.gameObject.GetComponent<Renderer>().bounds.size[1] / 2 + Time.deltaTime * ray_collide_down_l.collider.gameObject.GetComponent<VerticalPlateforme>().Vitesse_verticale),
                                                 transform.position.z);
 
-                    make_movement_horizontal(ray_collide_down_l.collider.gameObject.GetComponent<VerticalPlateforme>().Vitesse_horizontale);
+                        make_movement_horizontal(ray_collide_down_l.collider.gameObject.GetComponent<VerticalPlateforme>().Vitesse_horizontale);
 
-                }
-                else if (ray_collide_down_l.collider.gameObject.GetComponent<VerticalPlateforme>() != null && (Mathf.Abs(transform.position.y - ray_collide_down_l.point.y) <= sprite_height / 2) && ray_collide_down_l.collider.gameObject.GetComponent<VerticalPlateforme>().Vitesse_verticale > 0)
-                {
+                    }
+                    else if (ray_collide_down_l.collider.gameObject.GetComponent<VerticalPlateforme>() != null && (Mathf.Abs(transform.position.y - ray_collide_down_l.point.y) <= sprite_height / 2) && ray_collide_down_l.collider.gameObject.GetComponent<VerticalPlateforme>().Vitesse_verticale > 0)
+                    {
                         this.transform.position = new Vector3(transform.position.x,
-                                               (ray_collide_down_l.collider.gameObject.transform.position.y + sprite_height / 2 + ray_collide_down_l.collider.gameObject.GetComponent<Renderer>().bounds.size[1] / 2 +Time.deltaTime * ray_collide_down_l.collider.gameObject.GetComponent<VerticalPlateforme>().Vitesse_verticale),
+                                               (ray_collide_down_l.collider.gameObject.transform.position.y + sprite_height / 2 + ray_collide_down_l.collider.gameObject.GetComponent<Renderer>().bounds.size[1] / 2 + Time.deltaTime * ray_collide_down_l.collider.gameObject.GetComponent<VerticalPlateforme>().Vitesse_verticale),
                                                 transform.position.z);
-                }
-                else if (ray_collide_down_r.collider.gameObject.GetComponent<VerticalPlateforme>() != null && (Mathf.Abs(transform.position.y - ray_collide_down_l.point.y) > sprite_height / 2))
-                {
+                    }
+                    else if (ray_collide_down_r.collider.gameObject.GetComponent<VerticalPlateforme>() != null && (Mathf.Abs(transform.position.y - ray_collide_down_l.point.y) > sprite_height / 2))
+                    {
                         this.transform.position = new Vector3(transform.position.x,
                                                (ray_collide_down_r.collider.gameObject.transform.position.y + +sprite_height / 2 + ray_collide_down_r.collider.gameObject.GetComponent<Renderer>().bounds.size[1] / 2 + Time.deltaTime * ray_collide_down_r.collider.gameObject.GetComponent<VerticalPlateforme>().Vitesse_verticale),
                                                 transform.position.z);
-                    make_movement_horizontal(ray_collide_down_r.collider.gameObject.GetComponent<VerticalPlateforme>().Vitesse_horizontale);
-                }
-                else if (ray_collide_down_r.collider.gameObject.GetComponent<VerticalPlateforme>() != null && (Mathf.Abs(transform.position.y - ray_collide_down_r.point.y) <= sprite_height / 2) && ray_collide_down_r.collider.gameObject.GetComponent<VerticalPlateforme>().Vitesse_verticale > 0)
-                {
+                        make_movement_horizontal(ray_collide_down_r.collider.gameObject.GetComponent<VerticalPlateforme>().Vitesse_horizontale);
+                    }
+                    else if (ray_collide_down_r.collider.gameObject.GetComponent<VerticalPlateforme>() != null && (Mathf.Abs(transform.position.y - ray_collide_down_r.point.y) <= sprite_height / 2) && ray_collide_down_r.collider.gameObject.GetComponent<VerticalPlateforme>().Vitesse_verticale > 0)
+                    {
                         this.transform.position = new Vector3(transform.position.x,
                                            (ray_collide_down_r.collider.gameObject.transform.position.y + sprite_height / 2 + ray_collide_down_r.collider.gameObject.GetComponent<Renderer>().bounds.size[1] / 2 + Time.deltaTime * ray_collide_down_r.collider.gameObject.GetComponent<VerticalPlateforme>().Vitesse_verticale),
                                             transform.position.z);
+                    }
                 }
             }
-        }
-        else
-        {
-            if (this.transform.position.y < jump_origin_y + jump_height && !toStayUp)
+            else
             {
-                if (verif_collision(ray_collide_up_l, (sprite_height / 2), false) && verif_collision(ray_collide_up_r, (sprite_height / 2), false))
+                if (this.transform.position.y < jump_origin_y + jump_height && !toStayUp)
                 {
-                    if (ray_collide_up_l.point.y <= ray_collide_up_r.point.y)
+                    if (verif_collision(ray_collide_up_l, (sprite_height / 2), false) && verif_collision(ray_collide_up_r, (sprite_height / 2), false))
                     {
-                        if (transform.position.y + sprite_height / 2 + Time.deltaTime * gravity > ray_collide_up_l.point.y)
+                        if (ray_collide_up_l.point.y <= ray_collide_up_r.point.y)
                         {
-                            if (!ray_collide_up_l.collider.gameObject.GetComponent<PropertyPlatform>().IsGoThrough)
+                            if (transform.position.y + sprite_height / 2 + Time.deltaTime * gravity > ray_collide_up_l.point.y)
                             {
-                                if (ray_collide_up_l.collider.gameObject.GetComponent<PropertyPlatform>().IsKillPlayer)
+                                if (!ray_collide_up_l.collider.gameObject.GetComponent<PropertyPlatform>().IsGoThrough)
                                 {
-                                    this.transform.position = spawn_position;
+                                    if (ray_collide_up_l.collider.gameObject.GetComponent<PropertyPlatform>().IsKillPlayer)
+                                    {
+                                        this.transform.position = spawn_position;
+                                    }
+                                    else
+                                    {
+                                        this.transform.Translate(new Vector3(0, ray_collide_up_l.point.y - transform.position.y - sprite_height / 2, 0));
+                                        toStayUp = true;
+                                        jump_on = false;
+                                    }
                                 }
                                 else
                                 {
-                                    this.transform.Translate(new Vector3(0, ray_collide_up_l.point.y - transform.position.y - sprite_height / 2, 0));
-                                    toStayUp = true;
-                                    jump_on = false;
+                                    if (ray_collide_up_l.collider.gameObject.GetComponent<PropertyPlatform>().IsKillPlayer)
+                                    {
+                                        this.transform.position = spawn_position;
+                                    }
+                                    else
+                                    {
+                                        this.transform.position = new Vector3(this.transform.position.x,
+                                                                  ray_collide_up_l.collider.gameObject.transform.position.y + sprite_height / 2 + ray_collide_up_l.collider.gameObject.GetComponent<Renderer>().bounds.size[1] / 2
+                                                                  , this.transform.position.z);
+                                    }
+
                                 }
                             }
                             else
                             {
-                                if (ray_collide_up_l.collider.gameObject.GetComponent<PropertyPlatform>().IsKillPlayer)
+                                this.transform.Translate(new Vector3(0, Time.deltaTime * gravity, 0));
+                            }
+
+                        }
+                        else
+                        {
+
+                            if (transform.position.y + sprite_height / 2 + Time.deltaTime * gravity > ray_collide_up_r.point.y)
+                            {
+                                if (!ray_collide_up_r.collider.gameObject.GetComponent<PropertyPlatform>().IsGoThrough)
                                 {
-                                    this.transform.position = spawn_position;
+                                    if (ray_collide_up_r.collider.gameObject.GetComponent<PropertyPlatform>().IsKillPlayer)
+                                    {
+                                        this.transform.position = spawn_position;
+                                    }
+                                    else
+                                    {
+                                        this.transform.Translate(new Vector3(0, ray_collide_up_r.point.y - transform.position.y - sprite_height / 2, 0));
+                                        jump_on = false;
+                                        toStayUp = true;
+                                    }
                                 }
                                 else
                                 {
                                     this.transform.position = new Vector3(this.transform.position.x,
-                                                              ray_collide_up_l.collider.gameObject.transform.position.y + sprite_height / 2 + ray_collide_up_l.collider.gameObject.GetComponent<Renderer>().bounds.size[1] / 2
-                                                              , this.transform.position.z);
-                                }
-
-                            }
-                        }
-                        else
-                        {
-                            this.transform.Translate(new Vector3(0, Time.deltaTime * gravity, 0));
-                        }
-
-                    }
-                    else
-                    {
-
-                        if (transform.position.y + sprite_height / 2 + Time.deltaTime * gravity > ray_collide_up_r.point.y)
-                        {
-                            if (!ray_collide_up_r.collider.gameObject.GetComponent<PropertyPlatform>().IsGoThrough)
-                            {
-                                if (ray_collide_up_r.collider.gameObject.GetComponent<PropertyPlatform>().IsKillPlayer)
-                                {
-                                    this.transform.position = spawn_position;
-                                }
-                                else
-                                {
-                                    this.transform.Translate(new Vector3(0, ray_collide_up_r.point.y - transform.position.y - sprite_height / 2, 0));
+                                                                  ray_collide_up_r.collider.gameObject.transform.position.y + sprite_height / 2 + ray_collide_up_r.collider.gameObject.GetComponent<Renderer>().bounds.size[1] / 2
+                                                                  , this.transform.position.z);
                                     jump_on = false;
-                                    toStayUp = true;
                                 }
                             }
                             else
                             {
-                                this.transform.position = new Vector3(this.transform.position.x,
-                                                              ray_collide_up_r.collider.gameObject.transform.position.y + sprite_height / 2 + ray_collide_up_r.collider.gameObject.GetComponent<Renderer>().bounds.size[1] / 2
-                                                              , this.transform.position.z);
-                                jump_on = false;
+                                this.transform.Translate(new Vector3(0, Time.deltaTime * gravity, 0));
                             }
-                        }
-                        else
-                        {
-                            this.transform.Translate(new Vector3(0, Time.deltaTime * gravity, 0));
-                        }
 
-                    }
-                }
-                else
-                {
-                    jump_on = false;
-                    toStayUp = true;
-                }
-            }
-            else
-            {
-                if (jump_height_reached == 0)
-                {
-                    jump_height_reached = 0.01f;
-                }
-                else
-                {
-                    if (jump_height_reached >= time_stay_up)
-                    {
-                        jump_on = false;
-                        toStayUp = false;
+                        }
                     }
                     else
                     {
-                        jump_height_reached += Time.deltaTime;
+                        jump_on = false;
+                        toStayUp = true;
                     }
-                }
-            }
-        }
-
-
-       
-
-        if (ray_collide_right_d.collider.gameObject.GetComponent<VerticalPlateforme>() != null && (Mathf.Abs(transform.position.x - ray_collide_right_d.point.x) <= sprite_width / 2 + 0.02f))
-        {
-            if (ray_collide_right_d.collider.gameObject.GetComponent<VerticalPlateforme>().Vitesse_horizontale < 0)
-            {
-                make_movement_horizontal(ray_collide_right_d.collider.gameObject.GetComponent<VerticalPlateforme>().Vitesse_horizontale);
-            }
-        }
-        else if (ray_collide_right_u.collider.gameObject.GetComponent<VerticalPlateforme>() != null && (Mathf.Abs(transform.position.x - ray_collide_right_u.point.x) <= sprite_width / 2 + 0.02f))
-        {
-            if (ray_collide_right_u.collider.gameObject.GetComponent<VerticalPlateforme>().Vitesse_horizontale < 0)
-            {
-                make_movement_horizontal(ray_collide_right_u.collider.gameObject.GetComponent<VerticalPlateforme>().Vitesse_horizontale);
-            }
-        }
-
-
-        if (ray_collide_left_d.collider.gameObject.GetComponent<VerticalPlateforme>() != null && (Mathf.Abs(transform.position.x - ray_collide_left_d.point.x) <= sprite_width / 2 + 0.02f))
-        {
-            if (ray_collide_left_d.collider.gameObject.GetComponent<VerticalPlateforme>().Vitesse_horizontale > 0)
-            {
-                make_movement_horizontal(ray_collide_left_d.collider.gameObject.GetComponent<VerticalPlateforme>().Vitesse_horizontale);
-            }
-        }
-        else if (ray_collide_left_u.collider.gameObject.GetComponent<VerticalPlateforme>() != null && (Mathf.Abs(transform.position.x - ray_collide_left_u.point.x) <= sprite_width / 2 + 0.02f))
-        {
-            if (ray_collide_left_u.collider.gameObject.GetComponent<VerticalPlateforme>().Vitesse_horizontale > 0)
-            {
-                make_movement_horizontal(ray_collide_left_u.collider.gameObject.GetComponent<VerticalPlateforme>().Vitesse_horizontale);
-            }
-        }
-
-        if (ray_collide_up_l.collider.gameObject.GetComponent<VerticalPlateforme>() != null && Mathf.Abs(transform.position.y - ray_collide_up_l.point.y) <= sprite_height / 2 && ray_collide_up_l.collider.gameObject.GetComponent<VerticalPlateforme>().Vitesse_verticale < 0)
-        {
-            transform.position = new Vector3(transform.position.x, ray_collide_up_l.collider.gameObject.transform.position.y - ray_collide_up_l.collider.gameObject.GetComponent<Renderer>().bounds.size[1] / 2 - sprite_width / 2 - 0.1f, transform.position.z);
-        }
-        else if (ray_collide_up_r.collider.gameObject.GetComponent<VerticalPlateforme>() != null && Mathf.Abs(transform.position.y - ray_collide_up_r.point.y) <= sprite_height / 2 && ray_collide_up_r.collider.gameObject.GetComponent<VerticalPlateforme>().Vitesse_verticale < 0)
-        {
-            transform.position = new Vector3(transform.position.x, ray_collide_up_r.collider.gameObject.transform.position.y - ray_collide_up_r.collider.gameObject.GetComponent<Renderer>().bounds.size[1] / 2 - sprite_width / 2 - 0.1f, transform.position.z);
-        }
-
-        if (toDoWallJump)
-        {
-            if (Chrono_wall == 0)
-            {
-                time_to_use = time_wall_jump_effect;
-                if (speed_to_use == speed_horizontal_dash)
-                {
-                    time_to_use /= 2;
-                }
-            }
-
-            if (Chrono_wall < time_to_use)
-            {
-                Chrono_wall += Time.deltaTime;
-                if (isAgainstRightWall)
-                {
-                    make_movement_horizontal(impulsion_wall_jump * speed_to_use);
                 }
                 else
                 {
-                    make_movement_horizontal(-impulsion_wall_jump * speed_to_use);
+                    if (jump_height_reached == 0)
+                    {
+                        jump_height_reached = 0.01f;
+                    }
+                    else
+                    {
+                        if (jump_height_reached >= time_stay_up)
+                        {
+                            jump_on = false;
+                            toStayUp = false;
+                        }
+                        else
+                        {
+                            jump_height_reached += Time.deltaTime;
+                        }
+                    }
                 }
             }
-            else
+
+
+
+
+            if (ray_collide_right_d.collider.gameObject.GetComponent<VerticalPlateforme>() != null && (Mathf.Abs(transform.position.x - ray_collide_right_d.point.x) <= sprite_width / 2 + 0.02f))
             {
-                Chrono_wall = 0;
-                toDoWallJump = false;
+                if (ray_collide_right_d.collider.gameObject.GetComponent<VerticalPlateforme>().Vitesse_horizontale < 0)
+                {
+                    make_movement_horizontal(ray_collide_right_d.collider.gameObject.GetComponent<VerticalPlateforme>().Vitesse_horizontale);
+                }
+            }
+            else if (ray_collide_right_u.collider.gameObject.GetComponent<VerticalPlateforme>() != null && (Mathf.Abs(transform.position.x - ray_collide_right_u.point.x) <= sprite_width / 2 + 0.02f))
+            {
+                if (ray_collide_right_u.collider.gameObject.GetComponent<VerticalPlateforme>().Vitesse_horizontale < 0)
+                {
+                    make_movement_horizontal(ray_collide_right_u.collider.gameObject.GetComponent<VerticalPlateforme>().Vitesse_horizontale);
+                }
+            }
+
+
+            if (ray_collide_left_d.collider.gameObject.GetComponent<VerticalPlateforme>() != null && (Mathf.Abs(transform.position.x - ray_collide_left_d.point.x) <= sprite_width / 2 + 0.02f))
+            {
+                if (ray_collide_left_d.collider.gameObject.GetComponent<VerticalPlateforme>().Vitesse_horizontale > 0)
+                {
+                    make_movement_horizontal(ray_collide_left_d.collider.gameObject.GetComponent<VerticalPlateforme>().Vitesse_horizontale);
+                }
+            }
+            else if (ray_collide_left_u.collider.gameObject.GetComponent<VerticalPlateforme>() != null && (Mathf.Abs(transform.position.x - ray_collide_left_u.point.x) <= sprite_width / 2 + 0.02f))
+            {
+                if (ray_collide_left_u.collider.gameObject.GetComponent<VerticalPlateforme>().Vitesse_horizontale > 0)
+                {
+                    make_movement_horizontal(ray_collide_left_u.collider.gameObject.GetComponent<VerticalPlateforme>().Vitesse_horizontale);
+                }
+            }
+
+            if (ray_collide_up_l.collider.gameObject.GetComponent<VerticalPlateforme>() != null && Mathf.Abs(transform.position.y - ray_collide_up_l.point.y) <= sprite_height / 2 && ray_collide_up_l.collider.gameObject.GetComponent<VerticalPlateforme>().Vitesse_verticale < 0)
+            {
+                transform.position = new Vector3(transform.position.x, ray_collide_up_l.collider.gameObject.transform.position.y - ray_collide_up_l.collider.gameObject.GetComponent<Renderer>().bounds.size[1] / 2 - sprite_width / 2 - 0.1f, transform.position.z);
+            }
+            else if (ray_collide_up_r.collider.gameObject.GetComponent<VerticalPlateforme>() != null && Mathf.Abs(transform.position.y - ray_collide_up_r.point.y) <= sprite_height / 2 && ray_collide_up_r.collider.gameObject.GetComponent<VerticalPlateforme>().Vitesse_verticale < 0)
+            {
+                transform.position = new Vector3(transform.position.x, ray_collide_up_r.collider.gameObject.transform.position.y - ray_collide_up_r.collider.gameObject.GetComponent<Renderer>().bounds.size[1] / 2 - sprite_width / 2 - 0.1f, transform.position.z);
+            }
+
+            if (toDoWallJump)
+            {
+                if (Chrono_wall == 0)
+                {
+                    time_to_use = time_wall_jump_effect;
+                    if (speed_to_use == speed_horizontal_dash)
+                    {
+                        time_to_use /= 2;
+                    }
+                }
+
+                if (Chrono_wall < time_to_use)
+                {
+                    Chrono_wall += Time.deltaTime;
+                    if (isAgainstRightWall)
+                    {
+                        make_movement_horizontal(impulsion_wall_jump * speed_to_use);
+                    }
+                    else
+                    {
+                        make_movement_horizontal(-impulsion_wall_jump * speed_to_use);
+                    }
+                }
+                else
+                {
+                    Chrono_wall = 0;
+                    toDoWallJump = false;
+                }
             }
         }
     }
