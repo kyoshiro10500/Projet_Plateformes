@@ -60,7 +60,7 @@ public class VerticalPlateforme : MonoBehaviour {
         {
             if (is_horizontal)
             {
-                if (this.transform.position.x <= min_hauteur)
+                if (this.transform.position.x < min_hauteur)
                 {
                     vitesse = -vitesse;
                     vitesse_horizontale = vitesse;
@@ -74,8 +74,11 @@ public class VerticalPlateforme : MonoBehaviour {
                     this.transform.position = new Vector3(min_hauteur + max_amplitude, this.transform.position.y, this.transform.position.z);
                     toWait = true;
                 }
-
-                this.transform.Translate(new Vector3(Time.deltaTime * vitesse, 0, 0));
+                else
+                {
+                    this.transform.Translate(new Vector3(Time.deltaTime * vitesse, 0, 0));
+                }
+                
             }
             else
             {
@@ -93,7 +96,11 @@ public class VerticalPlateforme : MonoBehaviour {
                     this.transform.position = new Vector3(this.transform.position.x, min_hauteur + max_amplitude, this.transform.position.z);
                     toWait = true;
                 }
-                this.transform.Translate(new Vector3(0, Time.deltaTime * vitesse, 0));
+                else
+                {
+                    this.transform.Translate(new Vector3(0, Time.deltaTime * vitesse, 0));
+                }
+                
             }
         }
         else
